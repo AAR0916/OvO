@@ -1,103 +1,7 @@
 // ================= CRAZY ADS ===================
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-function inIframe() {
-  try {
-    return window.self !== window.top;
-  } catch (e) {
-    return true;
-  }
-}
 
-function initWebSdkWrapper(debug = false) {
-  let config = globalThis.adconfig;
-  let runtime = globalThis.cr_getC2Runtime();
-  let WebSdkWrapper = globalThis.WebSdkWrapper;
-  let postInit = () => {
-    WebSdkWrapper.loadingStart();
-    WebSdkWrapper.loadingProgress(runtime.loadingProgress * 100);
-    if (runtime.loadingprogress === 1) {
-      WebSdkWrapper.loadingEnd();
-    }
-    WebSdkWrapper.onUnlockAllLevels(() => {
-      c2_callFunction("unlockAllLevels");
-    });
-    WebSdkWrapper.onPause(() => {
-      c2_callFunction("websdk > pause");
-    });
-    WebSdkWrapper.onResume(() => {
-      c2_callFunction("websdk > resume");
-    });
-    WebSdkWrapper.onMute(() => {
-      c2_callFunction("muteSounds");
-    });
-    WebSdkWrapper.onUnmute(() => {
-      c2_callFunction("unmuteSounds");
-    });
-    WebSdkWrapper.onAdStarted(() => {
-      c2_callFunction("adStarted");
-    });
-  };
-
-  try {
-    let json = JSON.parse(config);
-    if (
-      json.hasOwnProperty("removeServiceWorker") &&
-      json.removeServiceWorker
-    ) {
-      removeServiceWorker();
-    }
-    if (json.hasOwnProperty("removeSocials")) {
-      globalThis.adconfigRemoveSocials = json.removeSocials ? 1 : 0;
-    } else {
-      globalThis.adconfigRemoveSocials = 0;
-    }
-    if (json.hasOwnProperty("stopAudioInBackground")) {
-      globalThis.adconfigStopAudioInBackground = json.stopAudioInBackground
-        ? 1
-        : 0;
-    } else {
-      globalThis.adconfigStopAudioInBackground = 0;
-    }
-    if (json.hasOwnProperty("removeMidrollRewarded")) {
-      globalThis.adconfigRemoveMidrollRewarded = json.removeMidrollRewarded
-        ? 1
-        : 0;
-    } else {
-      globalThis.adconfigRemoveMidrollRewarded = 0;
-    }
-    if (json.hasOwnProperty("noReligion")) {
-      globalThis.adconfigNoReligion = json.noReligion ? 1 : 0;
-    } else {
-      globalThis.adconfigNoReligion = 0;
-    }
-    if (json.hasOwnProperty("interTypes")) {
-      globalThis.interTypes = json.interTypes;
-    } else {
-      globalThis.interTypes = {};
-    }
-    if (json.hasOwnProperty("splashScreen")) {
-      globalThis.splashScreen = json.splashScreen;
-      globalThis.splashScreenName = json.name;
-      if (json.hasOwnProperty("sitelock") && json.sitelock) {
-        const allowedUrls = json.sites || [];
-        globalThis.needsSitelock = !siteLock(allowedUrls);
-        if (json.hasOwnProperty("correctWebsite")) {
-          globalThis.correctWebsite = json.correctWebsite;
-        }
-      } else {
-        globalThis.needsSitelock = false;
-      }
-    } else {
-      globalThis.splashScreen = false;
-    }
-
-    c2_callFunction("loaderLayoutInitialised", [
-      globalThis.splashScreen ? 1 : 0,
-      globalThis.splashScreenName || "",
-      globalThis.needsSitelock ? 1 : 0,
-      globalThis.correctWebsite || "",
-    ]);
 
     // let asas = () => {
     //   let i, s, a, l, f, b;
@@ -125,24 +29,6 @@ function initWebSdkWrapper(debug = false) {
   } catch (e) {
     WebSdkWrapper.init("", !!debug).then(postInit);
   }
-}
-
-function siteLock(urls) {
-  const currentHostname = window.location.hostname;
-
-  const currentHostnameParts = [
-    currentHostname,
-    ...currentHostname
-      .split(".")
-      .slice(1)
-      .map((part, i, arr) => arr.slice(i).join(".")),
-  ];
-
-  return urls.some((url) => {
-    return currentHostnameParts.some(
-      (allowedHostname) => allowedHostname === url
-    );
-  });
 }
 
 var crazysdk;
@@ -733,3 +619,4 @@ function convert_to_formated_hex(byte_arr) {
 
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 // =============== LZMA COMPRESS =================
+
